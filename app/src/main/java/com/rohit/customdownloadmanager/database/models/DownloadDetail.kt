@@ -1,4 +1,4 @@
-package com.rohit.customdownloadmanager.models
+package com.rohit.customdownloadmanager.database.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -12,8 +12,7 @@ data class DownloadDetail(
     var url: String,
     var filePath: String,
     var createdTime: Long,
+    var priority:Int,
     var downloadStatus: DownloadStatus,
-    var downloadProgress: Int,
-    var completedSize: Long,
-    var file: File
+    var downloadProgress: String
 )

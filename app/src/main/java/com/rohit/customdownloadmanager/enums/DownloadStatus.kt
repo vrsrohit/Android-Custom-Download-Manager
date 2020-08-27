@@ -1,4 +1,4 @@
-package com.rohit.customdownloadmanager
+package com.rohit.customdownloadmanager.enums
 
 enum class DownloadStatus {
     Waiting,
