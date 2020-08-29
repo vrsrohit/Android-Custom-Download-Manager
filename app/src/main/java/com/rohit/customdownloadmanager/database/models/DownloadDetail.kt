@@ -13,6 +13,6 @@ data class DownloadDetail(
     var filePath: String,
     var createdTime: Long,
     var priority:Int,
-    var downloadStatus: DownloadStatus,
+    var downloadStatus: String,
     var downloadProgress: String
 )
