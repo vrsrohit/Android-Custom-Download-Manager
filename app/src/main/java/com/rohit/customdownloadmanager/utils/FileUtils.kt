@@ -2,15 +2,17 @@ package com.rohit.customdownloadmanager.utils
 
 import android.content.Context
 import android.os.Environment
+import com.rohit.customdownloadmanager.enums.FileType
 import java.io.File
 import java.io.IOException
 import java.sql.Timestamp
 import java.util.*
 
 object FileUtils {
-    fun createFile(context: Context): File? {
+
+    fun createFile(context: Context, fileType: FileType, fileName: String): File? {
         val dir = File(
-            context.applicationContext.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
+            context.applicationContext.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),
             "TestDownloads"
         )
         try {
@@ -19,12 +21,15 @@ object FileUtils {
                 success = dir.mkdirs()
             }
             return if (success) {
-                File(
+                val file = File(
                     dir.absolutePath
                             + File.separator
-                            + Timestamp(Date().time).toString()
-                            + "test_download.pdf"
+                            + createFileName(fileType, fileName)
                 )
+                if (file.exists()) {
+                    file.delete()
+                }
+                file
             } else {
                 null
             }
@@ -32,6 +37,25 @@ object FileUtils {
             return null
         } catch (e: SecurityException) {
             return null
+        }
+    }
+
+    private fun createFileName(fileType: FileType, fileName: String): String {
+        return when (fileType) {
+            FileType.Pdf -> {
+                if (fileName.isEmpty()) {
+                    Timestamp(Date().time).toString() + "test_download.pdf"
+                } else {
+                    Timestamp(Date().time).toString() + fileName + ".pdf"
+                }
+            }
+            FileType.Video_mp4 -> {
+                if (fileName.isEmpty()) {
+                    Timestamp(Date().time).toString() + "test_video.mp4"
+                } else {
+                    Timestamp(Date().time).toString() + fileName + ".mp4"
+                }
+            }
         }
     }
 }

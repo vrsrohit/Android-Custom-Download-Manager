@@ -9,6 +9,7 @@ import java.io.File
 data class DownloadDetail(
     @PrimaryKey(autoGenerate = true)
     var downloadId: Int,
+    var fileName:String,
     var url: String,
     var filePath: String,
     var createdTime: Long,
