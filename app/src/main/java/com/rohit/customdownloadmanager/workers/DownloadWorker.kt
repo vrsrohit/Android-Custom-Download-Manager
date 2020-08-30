@@ -39,6 +39,7 @@ class DownloadWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(c
 
     private suspend fun performWork() {
         val downloadDetailList = getActiveDownloadList()
+        logi(message = "download list size -> " + downloadDetailList.size.toString())
         if (downloadDetailList.isNotEmpty()) {
             performDownloadTasks(downloadDetailList = downloadDetailList)
         } else {
@@ -48,8 +49,8 @@ class DownloadWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(c
 
     private suspend fun performDownloadTasks(downloadDetailList: List<DownloadDetail>) {
         for (downloadDetail in downloadDetailList) {
-            showFeedback(message = downloadDetail.fileName + " - download started")
             if (downloadDetail.downloadStatus != DownloadStatus.Completed) {
+                showFeedback(message = downloadDetail.fileName + " - download started")
                 downloadFile(downloadDetail = downloadDetail)
             }
         }
@@ -57,15 +58,14 @@ class DownloadWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(c
     }
 
     private suspend fun downloadFile(downloadDetail: DownloadDetail) {
+        try {
+            val client = OkHttpClient()
+            val request = Request.Builder().url(downloadDetail.url)
+                .addHeader("Content-Type", "application/json")
+                .build()
+            val response = client.newCall(request).execute()
 
-        val client = OkHttpClient()
-        val request = Request.Builder().url(downloadDetail.url)
-            .addHeader("Content-Type", "application/json")
-            .build()
-        val response = client.newCall(request).execute()
-
-        if (response.body != null) {
-            try {
+            if (response.body != null) {
                 val file = FileUtils.createFile(
                     applicationContext,
                     fileType = downloadDetail.fileType,
@@ -74,32 +74,34 @@ class DownloadWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(c
                 if (file != null) {
                     val inputStream = response.body?.byteStream()
                     inputStream?.let {
-                        //val file = File(downloadDetail.filePath)
                         file.copyInputStreamToFile(inputStream)
                         inputStream.close()
                         downloadDetail.downloadStatus = DownloadStatus.Completed
                         dataDatabase.downloadDao.updateDownloadDetail(downloadDetail = downloadDetail)
                         showFeedback(message = downloadDetail.fileName + " - download success")
+                        return
                     }
                 } else {
                     logi(message = downloadDetail.fileName + " - response body null - download failed")
                     updateDownloadFailed(downloadDetail = downloadDetail)
                 }
-
-
-            } catch (e: IOException) {
-                e.printStackTrace()
+            } else {
+                logi(message = downloadDetail.fileName + " - response body null - download failed")
                 updateDownloadFailed(downloadDetail = downloadDetail)
             }
-        } else {
-            logi(message = downloadDetail.fileName + " - response body null - download failed")
+        } catch (e: IOException) {
+            e.printStackTrace()
+            updateDownloadFailed(downloadDetail = downloadDetail)
+        } catch (e: Exception) {
+            e.printStackTrace()
             updateDownloadFailed(downloadDetail = downloadDetail)
         }
+
     }
 
-    private suspend fun updateDownloadFailed(downloadDetail: DownloadDetail) {
-        downloadDetail.downloadStatus = DownloadStatus.Stopped
-        dataDatabase.downloadDao.updateDownloadDetail(downloadDetail)
+    private fun updateDownloadFailed(downloadDetail: DownloadDetail) {
+        /*downloadDetail.downloadStatus = DownloadStatus.Stopped
+        dataDatabase.downloadDao.updateDownloadDetail(downloadDetail)*/
         val message = downloadDetail.fileName + " - download failed"
         showFeedback(message)
     }

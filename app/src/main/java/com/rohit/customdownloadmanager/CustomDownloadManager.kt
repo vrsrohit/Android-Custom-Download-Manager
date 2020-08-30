@@ -1,5 +1,6 @@
 package com.rohit.customdownloadmanager
 
+import android.content.Context
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
@@ -13,13 +14,16 @@ import java.sql.Timestamp
 import java.util.*
 
 class CustomDownloadManager(
+    private var downloadId: Int,
     private var fileName: String,
     private var fileType: FileType,
     private var url: String,
-    private var priority: Int
-) : MyApplication() {
+    private var priority: Int,
+    context: Context
+) {
 
-    private val database = MyDatabase.getInstance(applicationContext)
+    private var database = MyDatabase.getInstance(context)
+    private val workManager = WorkManager.getInstance(context)
 
     /* //Test links
     private val pdfUrl = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
@@ -28,6 +32,7 @@ class CustomDownloadManager(
 
     fun enqueueDownload() {
         val downloadDetail = DownloadDetail(
+            downloadId = downloadId,
             fileName = fileName,
             fileType = fileType,
             url = url,
@@ -47,25 +52,16 @@ class CustomDownloadManager(
 
     private fun startWorker() {
         runBlocking {
-            if (!isWorkerALive()) {
-                val downloadRequest = OneTimeWorkRequest
-                    .Builder(DownloadWorker::class.java)
-                    .build()
-                val workManager = WorkManager.getInstance(applicationContext)
-                workManager.enqueueUniqueWork(
-                    "downloadWorker",
-                    ExistingWorkPolicy.REPLACE,
-                    downloadRequest
-                )
-            }
+            val downloadRequest = OneTimeWorkRequest
+                .Builder(DownloadWorker::class.java)
+                .build()
+            workManager.enqueueUniqueWork(
+                "downloadWorker",
+                ExistingWorkPolicy.KEEP,
+                downloadRequest
+            )
         }
 
     }
-
-    private suspend fun isWorkerALive(): Boolean {
-        val pendingDownloads = database.downloadDao.getPendingDownloads()
-        return pendingDownloads.isNotEmpty()
-    }
-
 
 }

@@ -8,7 +8,7 @@ import com.rohit.customdownloadmanager.enums.FileType
 @Entity
 data class DownloadDetail(
     @PrimaryKey(autoGenerate = true)
-    val downloadId: Int = 1,
+    val downloadId: Int,
     var fileName: String,
     var fileType:FileType,
     var url: String,

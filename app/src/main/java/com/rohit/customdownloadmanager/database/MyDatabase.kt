@@ -22,7 +22,6 @@ import com.rohit.customdownloadmanager.database.models.DownloadDetail
 abstract class MyDatabase : RoomDatabase() {
     abstract val downloadDao: DownloadDao
 
-
     companion object {
 
         @Volatile

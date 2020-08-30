@@ -3,6 +3,8 @@ package com.rohit.customdownloadmanager
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -11,9 +13,11 @@ import androidx.databinding.DataBindingUtil
 import com.rohit.customdownloadmanager.databinding.ActivityMainBinding
 import com.rohit.customdownloadmanager.enums.FileType
 import com.rohit.customdownloadmanager.utils.HelperExtensions.toastShort
+import java.sql.Timestamp
+import java.util.*
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     private val requiredPermissions = arrayOf(
         Manifest.permission.READ_EXTERNAL_STORAGE,
         Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -24,7 +28,6 @@ class MainActivity : AppCompatActivity() {
     private val mFileTypes = arrayOf(FileType.Pdf.name, FileType.Video_mp4.name)
 
     private var mSelectedFileType: FileType? = null
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,14 +49,20 @@ class MainActivity : AppCompatActivity() {
             enqueueSampleVideoDownload()
         }
 
-        mBinding.spinnerFileType.setOnItemClickListener { _, _, position, _ ->
-            mSelectedFileType = getFileType(fileType = mFileTypes[position])
-        }
+        mBinding.spinnerFileType.onItemSelectedListener = this
 
         mBinding.tvDownload.setOnClickListener {
             enqueueCustomDownload()
         }
 
+    }
+
+    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        mSelectedFileType = getFileType(fileType = mFileTypes[position])
+    }
+
+    override fun onNothingSelected(parent: AdapterView<*>?) {
+        mSelectedFileType = null
     }
 
     private fun enqueueCustomDownload() {
@@ -84,10 +93,12 @@ class MainActivity : AppCompatActivity() {
 
             mSelectedFileType?.let { fileType ->
                 val customDownloadManager = CustomDownloadManager(
+                    downloadId = Timestamp(Date().time).nanos,
                     url = url,
                     fileName = fileName,
                     priority = priority,
-                    fileType = fileType
+                    fileType = fileType,
+                    context = applicationContext
                 )
                 customDownloadManager.enqueueDownload()
                 toastShort(message = "Download Enqueued")
@@ -102,10 +113,12 @@ class MainActivity : AppCompatActivity() {
         if (hasPermissions()) {
             val pdfUrl = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
             val customDownloadManager = CustomDownloadManager(
+                downloadId = Timestamp(Date().time).nanos,
                 url = pdfUrl,
                 fileName = "Test_Pdf",
                 priority = 1,
-                fileType = FileType.Pdf
+                fileType = FileType.Pdf,
+                context = applicationContext
             )
             customDownloadManager.enqueueDownload()
             toastShort(message = "Download Enqueued")
@@ -119,10 +132,12 @@ class MainActivity : AppCompatActivity() {
             val videoUrl =
                 "https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_640_3MG.mp4"
             val customDownloadManager = CustomDownloadManager(
+                downloadId = Timestamp(Date().time).nanos,
                 url = videoUrl,
                 fileName = "Test_Video",
                 priority = 1,
-                fileType = FileType.Video_mp4
+                fileType = FileType.Video_mp4,
+                context = applicationContext
             )
             customDownloadManager.enqueueDownload()
             toastShort(message = "Download Enqueued")
@@ -180,4 +195,5 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val PERMISSIONS_REQUEST_CODE = 10
     }
+
 }

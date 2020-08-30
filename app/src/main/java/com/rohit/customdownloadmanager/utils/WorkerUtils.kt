@@ -12,11 +12,11 @@ object WorkerUtils {
 
 
     private val VERBOSE_NOTIFICATION_CHANNEL_NAME: CharSequence =
-        "Verbose WorkManager Notifications"
+        "WorkManager Notifications"
     private const val VERBOSE_NOTIFICATION_CHANNEL_DESCRIPTION =
         "Shows notifications whenever work events occur"
-    private val NOTIFICATION_TITLE: CharSequence = "WorkRequest Starting"
-    private const val CHANNEL_ID = "VERBOSE_NOTIFICATION"
+    private val NOTIFICATION_TITLE: CharSequence = "WorkRequest Status"
+    private const val CHANNEL_ID = "work manager channel"
     private const val NOTIFICATION_ID = 1
 
     fun sendStatusNotification(message: String, context: Context) {
