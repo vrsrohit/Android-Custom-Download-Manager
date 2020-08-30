@@ -1,7 +1,7 @@
 package com.rohit.customdownloadmanager.enums
 
 enum class DownloadStatus {
-    Waiting,
+    Enqueued,
     Started,
     Paused,
     Resumed,

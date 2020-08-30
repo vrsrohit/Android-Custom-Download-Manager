@@ -6,7 +6,9 @@ import androidx.work.WorkerParameters
 import com.rohit.customdownloadmanager.database.MyDatabase
 import com.rohit.customdownloadmanager.database.models.DownloadDetail
 import com.rohit.customdownloadmanager.enums.DownloadStatus
+import com.rohit.customdownloadmanager.utils.FileUtils
 import com.rohit.customdownloadmanager.utils.HelperExtensions.logi
+import com.rohit.customdownloadmanager.utils.WorkerUtils.sendStatusNotification
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -16,6 +18,7 @@ import java.io.IOException
 import java.io.InputStream
 
 
+@Suppress("BlockingMethodInNonBlockingContext")
 class DownloadWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ctx, params) {
 
     private val dataDatabase = MyDatabase.getInstance(applicationContext)
@@ -23,30 +26,31 @@ class DownloadWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(c
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         return@withContext try {
-            logi("work started")
+            showFeedback(message = "work started")
             performWork()
-            logi("work ended")
+            showFeedback(message = "work ended")
             Result.success()
         } catch (error: Throwable) {
-            logi("work failed")
+            showFeedback(message = "work failed")
             error.printStackTrace()
             Result.failure()
         }
     }
 
     private suspend fun performWork() {
-        val downloadList = getActiveDownloadList()
-        if (downloadList.isNotEmpty()) {
-            performDownloadTasks(downloadList = downloadList)
+        val downloadDetailList = getActiveDownloadList()
+        if (downloadDetailList.isNotEmpty()) {
+            performDownloadTasks(downloadDetailList = downloadDetailList)
         } else {
             return
         }
     }
 
-    private suspend fun performDownloadTasks(downloadList: List<DownloadDetail>) {
-        for (download in downloadList) {
-            if (download.downloadStatus != DownloadStatus.Completed.name) {
-                downloadFile(download)
+    private suspend fun performDownloadTasks(downloadDetailList: List<DownloadDetail>) {
+        for (downloadDetail in downloadDetailList) {
+            showFeedback(message = downloadDetail.fileName + " - download started")
+            if (downloadDetail.downloadStatus != DownloadStatus.Completed) {
+                downloadFile(downloadDetail = downloadDetail)
             }
         }
         performWork()
@@ -62,30 +66,47 @@ class DownloadWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(c
 
         if (response.body != null) {
             try {
-                val inputStream = response.body?.byteStream()
-                inputStream?.let {
-                    val file = File(downloadDetail.filePath)
-                    file.copyInputStreamToFile(inputStream)
-                    inputStream.close()
-                    downloadDetail.downloadStatus = DownloadStatus.Completed.name
-                    dataDatabase.downloadDao.updateDownloadDetail(downloadDetail)
-                    logi(downloadDetail.fileName + " - download done")
+                val file = FileUtils.createFile(
+                    applicationContext,
+                    fileType = downloadDetail.fileType,
+                    downloadDetail.fileName
+                )
+                if (file != null) {
+                    val inputStream = response.body?.byteStream()
+                    inputStream?.let {
+                        //val file = File(downloadDetail.filePath)
+                        file.copyInputStreamToFile(inputStream)
+                        inputStream.close()
+                        downloadDetail.downloadStatus = DownloadStatus.Completed
+                        dataDatabase.downloadDao.updateDownloadDetail(downloadDetail = downloadDetail)
+                        showFeedback(message = downloadDetail.fileName + " - download success")
+                    }
+                } else {
+                    logi(message = downloadDetail.fileName + " - response body null - download failed")
+                    updateDownloadFailed(downloadDetail = downloadDetail)
                 }
+
 
             } catch (e: IOException) {
                 e.printStackTrace()
-                updateDownloadFailed(downloadDetail)
+                updateDownloadFailed(downloadDetail = downloadDetail)
             }
         } else {
-            logi(downloadDetail.fileName + " - response body null - download failed")
-            updateDownloadFailed(downloadDetail)
+            logi(message = downloadDetail.fileName + " - response body null - download failed")
+            updateDownloadFailed(downloadDetail = downloadDetail)
         }
     }
 
     private suspend fun updateDownloadFailed(downloadDetail: DownloadDetail) {
-        downloadDetail.downloadStatus = DownloadStatus.Stopped.name
+        downloadDetail.downloadStatus = DownloadStatus.Stopped
         dataDatabase.downloadDao.updateDownloadDetail(downloadDetail)
-        logi(downloadDetail.fileName + " - download failed")
+        val message = downloadDetail.fileName + " - download failed"
+        showFeedback(message)
+    }
+
+    private fun showFeedback(message: String) {
+        logi(message = message)
+        sendStatusNotification(message = message, context = applicationContext)
     }
 
 

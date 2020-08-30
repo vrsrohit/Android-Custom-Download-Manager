@@ -13,7 +13,7 @@ object FileUtils {
     fun createFile(context: Context, fileType: FileType, fileName: String): File? {
         val dir = File(
             context.applicationContext.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),
-            "TestDownloads"
+            "CustomDownloads"
         )
         try {
             var success = true

@@ -1,4 +1,4 @@
-package com.rohit.customdownloadmanager.database
+package com.rohit.customdownloadmanager.database.dao
 
 import androidx.room.*
 import com.rohit.customdownloadmanager.database.models.DownloadDetail

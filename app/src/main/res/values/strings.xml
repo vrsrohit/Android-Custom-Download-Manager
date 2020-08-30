@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">Custom Download Manager</string>
+    <string name="text_download_sample_video">Download Sample Video</string>
+    <string name="text_download_sample_pdf">Download Sample Pdf</string>
+    <string name="text_url">URL -</string>
+    <string name="text_url_hint">enter your url</string>
+    <string name="text_file_name">File Name -</string>
+    <string name="text_file_name_hint">enter your file name</string>
+    <string name="text_priority">Priority -</string>
+    <string name="text_priority_hint">enter your priority</string>
+    <string name="text_filetype">FileType -</string>
+    <string name="text_download">Download</string>
 </resources>

@@ -3,17 +3,18 @@ package com.rohit.customdownloadmanager.database.models
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.rohit.customdownloadmanager.enums.DownloadStatus
-import java.io.File
+import com.rohit.customdownloadmanager.enums.FileType
 
 @Entity
 data class DownloadDetail(
     @PrimaryKey(autoGenerate = true)
-    var downloadId: Int,
-    var fileName:String,
+    val downloadId: Int = 1,
+    var fileName: String,
+    var fileType:FileType,
     var url: String,
-    var filePath: String,
-    var createdTime: Long,
-    var priority:Int,
-    var downloadStatus: String,
-    var downloadProgress: String
-)
+    var createdTime: Int,
+    var priority: Int,
+    var downloadStatus: DownloadStatus
+) {
+    var filePath: String = ""
+}

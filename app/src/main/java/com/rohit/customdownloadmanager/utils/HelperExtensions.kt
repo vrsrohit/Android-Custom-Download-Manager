@@ -1,12 +1,12 @@
 package com.rohit.customdownloadmanager.utils
 
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
-import androidx.work.CoroutineWorker
 
 object HelperExtensions {
 
-    fun CoroutineWorker.toastShort(message: CharSequence) {
+    fun Context.toastShort(message: CharSequence) {
         Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
     }
 

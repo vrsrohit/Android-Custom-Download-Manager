@@ -4,12 +4,19 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import com.rohit.customdownloadmanager.database.converters.DownloadDetailConverter
+import com.rohit.customdownloadmanager.database.dao.DownloadDao
 import com.rohit.customdownloadmanager.database.models.DownloadDetail
 
 
 @Database(
     entities = [DownloadDetail::class],
     version = 1
+)
+
+@TypeConverters(
+    DownloadDetailConverter::class
 )
 abstract class MyDatabase : RoomDatabase() {
     abstract val downloadDao: DownloadDao
@@ -27,7 +34,8 @@ abstract class MyDatabase : RoomDatabase() {
                     instance = Room.databaseBuilder(
                         context.applicationContext,
                         MyDatabase::class.java,
-                        "myDatabase.db")
+                        "myDatabase.db"
+                    )
                         .fallbackToDestructiveMigration()
                         .build()
                     INSTANCE = instance

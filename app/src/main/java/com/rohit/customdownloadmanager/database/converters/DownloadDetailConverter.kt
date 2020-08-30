@@ -1,28 +1,28 @@
-package com.asianpaints.entities.converters
+package com.rohit.customdownloadmanager.database.converters
 
 
 import androidx.room.TypeConverter
-import com.asianpaints.core.Utility
-import com.asianpaints.entities.model.idea.CollectionDecorModel
+import com.rohit.customdownloadmanager.database.models.DownloadDetail
+import com.rohit.customdownloadmanager.utils.DatabaseUtils.defaultGson
 
 
-class CollectionDecorModelConverter {
+class DownloadDetailConverter {
 
     @TypeConverter
-    fun stringToCollectionDecorModel(data: String?): CollectionDecorModel? {
+    fun stringToDownloadDetail(data: String?): DownloadDetail? {
         if (data == null) {
             return null
         }
-        val gson = Utility.defaultGson()
-        return gson.fromJson(data, CollectionDecorModel::class.java)
+        val gson = defaultGson()
+        return gson.fromJson(data, DownloadDetail::class.java)
     }
 
     @TypeConverter
-    fun collectionDecorModelToString(collectionDecorModel: CollectionDecorModel?): String? {
-        if (collectionDecorModel == null) {
+    fun downloadDetailToString(downloadDetail: DownloadDetail?): String? {
+        if (downloadDetail == null) {
             return null
         }
-        val gson = Utility.defaultGson()
-        return gson.toJson(collectionDecorModel)
+        val gson = defaultGson()
+        return gson.toJson(downloadDetail)
     }
 }
