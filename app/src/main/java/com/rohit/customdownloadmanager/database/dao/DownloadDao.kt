@@ -19,7 +19,7 @@ abstract class DownloadDao {
     abstract suspend fun getAllDownloads(): List<DownloadDetail>
 
     @Query("SELECT * FROM DownloadDetail WHERE downloadStatus LIKE :downloadStatus ORDER BY priority DESC ")
-    abstract suspend fun getPendingDownloads(downloadStatus: String = DownloadStatus.Waiting.name): List<DownloadDetail>
+    abstract suspend fun getPendingDownloads(downloadStatus: String = DownloadStatus.Enqueued.name): List<DownloadDetail>
 
     @Query("SELECT * FROM DownloadDetail WHERE downloadStatus LIKE :downloadStatus ORDER BY priority ASC ")
     abstract suspend fun getCompletedDownloads(downloadStatus: String = DownloadStatus.Completed.name): List<DownloadDetail>
