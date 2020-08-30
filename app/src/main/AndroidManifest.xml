@@ -23,9 +23,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".TestActivity"
-            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

@@ -5,7 +5,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.rohit.customdownloadmanager.database.converters.DownloadDetailConverter
+import com.rohit.customdownloadmanager.database.converters.DownloadStatusConverter
+import com.rohit.customdownloadmanager.database.converters.FileTypeConverter
 import com.rohit.customdownloadmanager.database.dao.DownloadDao
 import com.rohit.customdownloadmanager.database.models.DownloadDetail
 
@@ -16,7 +17,7 @@ import com.rohit.customdownloadmanager.database.models.DownloadDetail
 )
 
 @TypeConverters(
-    DownloadDetailConverter::class
+    DownloadStatusConverter::class, FileTypeConverter::class
 )
 abstract class MyDatabase : RoomDatabase() {
     abstract val downloadDao: DownloadDao
