@@ -28,10 +28,10 @@ class DownloadWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(c
         return@withContext try {
             showFeedback(message = "work started")
             performWork()
-            showFeedback(message = "work ended")
+            logi(message = "work ended")
             Result.success()
         } catch (error: Throwable) {
-            showFeedback(message = "work failed")
+            logi(message = "work failed")
             error.printStackTrace()
             Result.failure()
         }
@@ -66,19 +66,28 @@ class DownloadWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(c
             val response = client.newCall(request).execute()
 
             if (response.body != null) {
+                if (downloadDetail.filePath.isNotEmpty()) {
+                    val file = File(downloadDetail.filePath)
+                    if (file.exists()) {
+                        file.delete()
+                    }
+                }
                 val file = FileUtils.createFile(
                     applicationContext,
                     fileType = downloadDetail.fileType,
                     downloadDetail.fileName
                 )
                 if (file != null) {
+                    downloadDetail.filePath = file.absolutePath
+                    dataDatabase.downloadDao.updateDownloadDetail(downloadDetail = downloadDetail)
                     val inputStream = response.body?.byteStream()
                     inputStream?.let {
                         file.copyInputStreamToFile(inputStream)
                         inputStream.close()
                         downloadDetail.downloadStatus = DownloadStatus.Completed
                         dataDatabase.downloadDao.updateDownloadDetail(downloadDetail = downloadDetail)
-                        showFeedback(message = downloadDetail.fileName + " - download success")
+                        val message = downloadDetail.fileName + " - download success" + downloadDetail.filePath
+                        showFeedback(message = message)
                         return
                     }
                 } else {
@@ -100,8 +109,6 @@ class DownloadWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(c
     }
 
     private fun updateDownloadFailed(downloadDetail: DownloadDetail) {
-        /*downloadDetail.downloadStatus = DownloadStatus.Stopped
-        dataDatabase.downloadDao.updateDownloadDetail(downloadDetail)*/
         val message = downloadDetail.fileName + " - download failed"
         showFeedback(message)
     }

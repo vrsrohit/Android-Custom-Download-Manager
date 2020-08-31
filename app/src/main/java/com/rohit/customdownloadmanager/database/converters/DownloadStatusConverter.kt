@@ -2,9 +2,7 @@ package com.rohit.customdownloadmanager.database.converters
 
 
 import androidx.room.TypeConverter
-import com.rohit.customdownloadmanager.database.models.DownloadDetail
 import com.rohit.customdownloadmanager.enums.DownloadStatus
-import com.rohit.customdownloadmanager.enums.FileType
 import com.rohit.customdownloadmanager.utils.DatabaseUtils.defaultGson
 
 

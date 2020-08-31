@@ -1,7 +1,11 @@
 <resources>
     <string name="app_name">Custom Download Manager</string>
-    <string name="text_download_sample_video">Download Sample Video</string>
-    <string name="text_download_sample_pdf">Download Sample Pdf</string>
+    <string name="text_download_video">Download 10mb Video</string>
+    <string name="text_download_audio">Download Audio</string>
+    <string name="text_download_pdf">Download Pdf</string>
+    <string name="text_download_docx">Download Docx</string>
+    <string name="text_download_png">Download Png</string>
+    <string name="text_download_jpg">Download Jpg</string>
     <string name="text_url">URL -</string>
     <string name="text_url_hint">enter your url</string>
     <string name="text_file_name">File Name -</string>

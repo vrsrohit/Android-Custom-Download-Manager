@@ -15,7 +15,7 @@ object WorkerUtils {
         "WorkManager Notifications"
     private const val VERBOSE_NOTIFICATION_CHANNEL_DESCRIPTION =
         "Shows notifications whenever work events occur"
-    private val NOTIFICATION_TITLE: CharSequence = "WorkRequest Status"
+    private val NOTIFICATION_TITLE: CharSequence = "Download Request Status"
     private const val CHANNEL_ID = "work manager channel"
     private const val NOTIFICATION_ID = 1
 
@@ -38,6 +38,7 @@ object WorkerUtils {
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle(NOTIFICATION_TITLE)
+            .setContentInfo(message)
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setVibrate(LongArray(0))

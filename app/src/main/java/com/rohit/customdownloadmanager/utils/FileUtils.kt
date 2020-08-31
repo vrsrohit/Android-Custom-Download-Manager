@@ -44,16 +44,44 @@ object FileUtils {
         return when (fileType) {
             FileType.Pdf -> {
                 if (fileName.isEmpty()) {
-                    Timestamp(Date().time).toString() + "test_download.pdf"
+                    Timestamp(Date().time).toString() + "test_pdf.pdf"
                 } else {
                     Timestamp(Date().time).toString() + fileName + ".pdf"
                 }
             }
-            FileType.Video_mp4 -> {
+            FileType.Mp4 -> {
                 if (fileName.isEmpty()) {
                     Timestamp(Date().time).toString() + "test_video.mp4"
                 } else {
                     Timestamp(Date().time).toString() + fileName + ".mp4"
+                }
+            }
+            FileType.Mp3 -> {
+                if (fileName.isEmpty()) {
+                    Timestamp(Date().time).toString() + "test_audio.mp3"
+                } else {
+                    Timestamp(Date().time).toString() + fileName + ".mp3"
+                }
+            }
+            FileType.Docx -> {
+                if (fileName.isEmpty()) {
+                    Timestamp(Date().time).toString() + "test_doc.docx"
+                } else {
+                    Timestamp(Date().time).toString() + fileName + ".docx"
+                }
+            }
+            FileType.Png -> {
+                if (fileName.isEmpty()) {
+                    Timestamp(Date().time).toString() + "test_png.png"
+                } else {
+                    Timestamp(Date().time).toString() + fileName + ".png"
+                }
+            }
+            FileType.Jpg -> {
+                if (fileName.isEmpty()) {
+                    Timestamp(Date().time).toString() + "test_jpg.jpg"
+                } else {
+                    Timestamp(Date().time).toString() + fileName + ".jpg"
                 }
             }
         }
