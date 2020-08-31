@@ -21,7 +21,7 @@ import java.io.InputStream
 @Suppress("BlockingMethodInNonBlockingContext")
 class DownloadWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ctx, params) {
 
-    private val dataDatabase = MyDatabase.getInstance(applicationContext)
+    private val myDatabase = MyDatabase.getInstance(applicationContext)
 
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
@@ -38,23 +38,14 @@ class DownloadWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(c
     }
 
     private suspend fun performWork() {
-        val downloadDetailList = getActiveDownloadList()
-        logi(message = "download list size -> " + downloadDetailList.size.toString())
-        if (downloadDetailList.isNotEmpty()) {
-            performDownloadTasks(downloadDetailList = downloadDetailList)
+        val downloadDetail = getActiveDownload()
+        if (downloadDetail != null && downloadDetail.downloadStatus != DownloadStatus.Completed) {
+            showFeedback(message = downloadDetail.fileName + " - download started")
+            downloadFile(downloadDetail)
+            performWork()
         } else {
             return
         }
-    }
-
-    private suspend fun performDownloadTasks(downloadDetailList: List<DownloadDetail>) {
-        for (downloadDetail in downloadDetailList) {
-            if (downloadDetail.downloadStatus != DownloadStatus.Completed) {
-                showFeedback(message = downloadDetail.fileName + " - download started")
-                downloadFile(downloadDetail = downloadDetail)
-            }
-        }
-        performWork()
     }
 
     private suspend fun downloadFile(downloadDetail: DownloadDetail) {
@@ -79,16 +70,16 @@ class DownloadWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(c
                 )
                 if (file != null) {
                     downloadDetail.filePath = file.absolutePath
-                    dataDatabase.downloadDao.updateDownloadDetail(downloadDetail = downloadDetail)
+                    myDatabase.downloadDao.updateDownloadDetail(downloadDetail = downloadDetail)
                     val inputStream = response.body?.byteStream()
                     inputStream?.let {
                         file.copyInputStreamToFile(inputStream)
                         inputStream.close()
                         downloadDetail.downloadStatus = DownloadStatus.Completed
-                        dataDatabase.downloadDao.updateDownloadDetail(downloadDetail = downloadDetail)
-                        val message = downloadDetail.fileName + " - download success" + downloadDetail.filePath
+                        myDatabase.downloadDao.updateDownloadDetail(downloadDetail = downloadDetail)
+                        val message =
+                            downloadDetail.fileName + " - download success" + downloadDetail.filePath
                         showFeedback(message = message)
-                        return
                     }
                 } else {
                     logi(message = downloadDetail.fileName + " - response body null - download failed")
@@ -125,8 +116,8 @@ class DownloadWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(c
         }
     }
 
-    private suspend fun getActiveDownloadList(): List<DownloadDetail> {
-        return dataDatabase.downloadDao.getPendingDownloads()
+    private suspend fun getActiveDownload(): DownloadDetail? {
+        return myDatabase.downloadDao.getPendingDownload()
     }
 
 
