@@ -6,6 +6,7 @@ import com.rohit.customdownloadmanager.database.MyDatabase
 import com.rohit.customdownloadmanager.database.models.DownloadDetail
 import com.rohit.customdownloadmanager.enums.DownloadStatus
 import com.rohit.customdownloadmanager.enums.FileType
+import com.rohit.customdownloadmanager.utils.Constants
 import com.rohit.customdownloadmanager.workers.DownloadWorker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -55,7 +56,7 @@ class CustomDownloadManager(
             .setConstraints(constraints)
             .build()
         workManager.enqueueUniqueWork(
-            "downloadWorker",
+            Constants.workerName,
             ExistingWorkPolicy.KEEP,
             downloadRequest
         )

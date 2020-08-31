@@ -8,25 +8,17 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.rohit.customdownloadmanager.R
 
-object WorkerUtils {
+object NotificationUtils {
 
 
-    private val VERBOSE_NOTIFICATION_CHANNEL_NAME: CharSequence =
-        "WorkManager Notifications"
-    private const val VERBOSE_NOTIFICATION_CHANNEL_DESCRIPTION =
-        "Shows notifications whenever work events occur"
-    private val NOTIFICATION_TITLE: CharSequence = "Download Request Status"
-    private const val CHANNEL_ID = "work manager channel"
-    private const val NOTIFICATION_ID = 1
-
-    fun sendStatusNotification(message: String, context: Context) {
+    fun sendStatusNotification(message: String, context: Context, notificationId: Int) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
-            val name = VERBOSE_NOTIFICATION_CHANNEL_NAME
-            val description = VERBOSE_NOTIFICATION_CHANNEL_DESCRIPTION
+            val name = Constants.notificationChannelName
+            val description = Constants.notificationChannelDescription
             val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel(CHANNEL_ID, name, importance)
+            val channel = NotificationChannel(Constants.notificationChannelId, name, importance)
             channel.description = description
 
             val notificationManager =
@@ -35,14 +27,14 @@ object WorkerUtils {
             notificationManager?.createNotificationChannel(channel)
         }
 
-        val builder = NotificationCompat.Builder(context, CHANNEL_ID)
+        val builder = NotificationCompat.Builder(context, Constants.notificationChannelId)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle(NOTIFICATION_TITLE)
+            .setContentTitle(Constants.notificationTitle)
             .setContentInfo(message)
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setVibrate(LongArray(0))
 
-        NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, builder.build())
+        NotificationManagerCompat.from(context).notify(notificationId, builder.build())
     }
 }

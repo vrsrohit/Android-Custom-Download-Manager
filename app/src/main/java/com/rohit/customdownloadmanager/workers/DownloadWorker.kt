@@ -8,7 +8,7 @@ import com.rohit.customdownloadmanager.database.models.DownloadDetail
 import com.rohit.customdownloadmanager.enums.DownloadStatus
 import com.rohit.customdownloadmanager.utils.FileUtils
 import com.rohit.customdownloadmanager.utils.HelperExtensions.logi
-import com.rohit.customdownloadmanager.utils.WorkerUtils.sendStatusNotification
+import com.rohit.customdownloadmanager.utils.NotificationUtils.sendStatusNotification
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -16,6 +16,8 @@ import okhttp3.Request
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
+import java.sql.Timestamp
+import java.util.*
 
 
 @Suppress("BlockingMethodInNonBlockingContext")
@@ -26,7 +28,7 @@ class DownloadWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(c
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         return@withContext try {
-            showFeedback(message = "work started")
+            logi(message = "work started")
             performWork()
             logi(message = "work ended")
             Result.success()
@@ -106,7 +108,7 @@ class DownloadWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(c
 
     private fun showFeedback(message: String) {
         logi(message = message)
-        sendStatusNotification(message = message, context = applicationContext)
+        sendStatusNotification(message = message, context = applicationContext,  Timestamp(Date().time).nanos)
     }
 
 
